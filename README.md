@@ -12,7 +12,7 @@ Po wybraniu interesujących nas konkurencji do "opieczętowania" należy wygener
 
 ## Instalacja w środowisku Windows (pojedynczy plik EXE)
 
-Z katalogu ``dist`` w niniejszym repozytorium należy pobrać, a następnie uruchomić plik ``metryczka.exe`` - to jest skompilowane archiwum zawierające program, interpreter języka Python oraz m.in. biblioteki Qt6.
+Z zakładki *Releases* na Githubie należy kliknąć aktualną wersję (*Latest*), następnie z drzewka *Assets* pobrać, oraz uruchomić plik ``metryczka.exe`` - to jest skompilowane archiwum zawierające program, interpreter języka Python oraz m.in. biblioteki Qt6.
 Plik wynikowy został wygenerowany przy pomocy narzędzia ``pyinstaller``.
 
 ## Instalacja w środowisku Windows (Python + Virtual Env)
