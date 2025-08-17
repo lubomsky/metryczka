@@ -17,10 +17,10 @@ Plik wynikowy został wygenerowany przy pomocy narzędzia ``pyinstaller``.
 
 ## Instalacja w środowisku Windows (Python + Virtual Env)
 
-1. Co do zasady używanie niniejszego programu w systemie Windows nie jest zalecane. Program był pisany i w środowisku Linux, ale przy użyciu bibliotek, które mają wsparcie dla systemu Windows, więc *wszystko powinno działać*.
+1. Program był pisany w środowisku Linux, ale przy użyciu bibliotek, które mają wsparcie dla systemu Windows, więc *wszystko powinno działać*.
 Autor nie ponosi odpowiedzialności za pracę programu w systemie Windows oraz nie udziela żadnego wsparcia co do obsługi programu w systemie Windows;
 
-1. Musisz mieć zainstalowany interpreter języka Python 3, można pobrać gotowy, skompilowany w formie instalatora z <a href="https://www.python.org/downloads/windows/"do pobrania stąd</a> Warto wybrać najnowszą wersję. **UWAGA: podczas instalacji Python należy koniecznie zaznaczyć opcję "Add python.exe to PATH"**;
+1. Musisz mieć zainstalowany interpreter języka Python 3, można pobrać gotowy, skompilowany w formie instalatora z <a href="https://www.python.org/downloads/windows/">do pobrania stąd</a> Warto wybrać najnowszą wersję. **UWAGA: podczas instalacji Python należy koniecznie zaznaczyć opcję "Add python.exe to PATH"**;
 
 1. Należy pobrać kod tego programu do metryczek z Githuba na swój komputer;
 
@@ -31,7 +31,7 @@ Autor nie ponosi odpowiedzialności za pracę programu w systemie Windows oraz n
 ## Instalacja w środowisku Linux
 
 1. Należy utworzyć środowisko wirtualne do pythona 3:
-``python 3 -m venv venv``
+``python3 -m venv venv``
 
 1. Aktywować środowisko Virtual Env
 ``source venv/bin/activate``
