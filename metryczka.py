@@ -29,8 +29,10 @@ from PyQt6.QtWidgets import (
 from gui.metryczka_ui import Ui_MainWindow
 from metryczka_cli import (
     stamp_dop,
+    stamp_pom,
     stamp_wlasna,
     stamp_klubowa,
+    card_hide,
     t_zawody,
 )
 
@@ -51,7 +53,11 @@ class ScoreSheet:
     def __init__(self, filename):
         self.filename = filename
         self.cards = []
-        self._doc = pymupdf.open(filename)
+        self._doc = None
+        self._load()
+
+    def _load(self):
+        self._doc = pymupdf.open(self.filename)
         for page in self._doc:
             w = page.get_text("words")
             card = None
@@ -66,9 +72,14 @@ class ScoreSheet:
     def save(self, fp):
         self._doc.save(fp)
 
+    def reset(self):
+        self.cards = []
+        self._load()
+
 
 class MainUI(QMainWindow):
     def __init__(self):
+        pomoc_info = True
         super().__init__()
         self.score_sheet = None
         self.ui = Ui_MainWindow()
@@ -77,19 +88,25 @@ class MainUI(QMainWindow):
 
         self.ui.pbWczytaj.clicked.connect(self.load_data)
         self.ui.pbZapisz.clicked.connect(self.save_data)
+        self.ui.pbReset.clicked.connect(self.reset_scene)
         for i in range(1, 13):
             btn_klubowa = getattr(self.ui, f"k{i}_klubowa")
             btn_wlasna = getattr(self.ui, f"k{i}_wlasna")
+            cb_pomoc = getattr(self.ui, f"k{i}_pom")
             btn_klubowa.clicked.connect(lambda c, x=i: self.uncheck(f"k{x}_wlasna"))
             btn_wlasna.clicked.connect(lambda c, y=i: self.uncheck(f"k{y}_klubowa"))
+            cb_pomoc.clicked.connect(self.pomoc_info)
 
     def reset_scene(self):
+        self.score_sheet = None
         self.ui.cb_przezroczyste.setChecked(False)
         for i in range(1, 13):
             text = getattr(self.ui, f"k{i}_edit")
             btn_klubowa = getattr(self.ui, f"k{i}_klubowa")
             btn_wlasna = getattr(self.ui, f"k{i}_wlasna")
             cb_dop = getattr(self.ui, f"k{i}_dop")
+            cb_pomoc = getattr(self.ui, f"k{i}_pom")
+            cb_enable = getattr(self.ui, f"k{i}_en")
             text.setText("")
             btn_klubowa.setEnabled(False)
             btn_klubowa.setChecked(False)
@@ -97,10 +114,25 @@ class MainUI(QMainWindow):
             btn_wlasna.setChecked(False)
             cb_dop.setEnabled(False)
             cb_dop.setChecked(False)
+            cb_pomoc.setEnabled(False)
+            cb_pomoc.setChecked(False)
+            cb_enable.setEnabled(False)
+            cb_enable.setChecked(False)
 
     def uncheck(self, obj_name):
         w = getattr(self.ui, obj_name)
         w.setChecked(False)
+
+    def pomoc_info(self):
+        if not self.pomoc_info:
+            return
+        QMessageBox.warning(
+            self, "Uwaga!",
+            'Opcję "POMOCNIK" zaznacz TYLKO WTEDY gdy pełnisz funkcję na zawodach! '
+            'Twoje prawo do statusu "pomocnika" powinno być ZAWSZE ustalane z '
+            'organizatorem zawodów.'
+        )
+        self.pomoc_info = False
 
     def load_data(self):
         self.reset_scene()
@@ -121,10 +153,15 @@ class MainUI(QMainWindow):
             btn_klubowa = getattr(self.ui, f"k{i+1}_klubowa")
             btn_wlasna = getattr(self.ui, f"k{i+1}_wlasna")
             cb_dop = getattr(self.ui, f"k{i+1}_dop")
+            cb_pomoc = getattr(self.ui, f"k{i+1}_pom")
+            cb_enable = getattr(self.ui, f"k{i+1}_en")
             text.setText(c.name)
             btn_klubowa.setEnabled(True)
             btn_wlasna.setEnabled(True)
             cb_dop.setEnabled(True)
+            cb_pomoc.setEnabled(True)
+            cb_enable.setEnabled(True)
+            cb_enable.setChecked(True)
         if self.ui.k1_edit.text() == "":
             QMessageBox.critical(
                 self, "Oh!",
@@ -154,17 +191,25 @@ class MainUI(QMainWindow):
             klubowa = getattr(self.ui, f"k{i+1}_klubowa")
             wlasna = getattr(self.ui, f"k{i+1}_wlasna")
             dop = getattr(self.ui, f"k{i+1}_dop")
+            pomoc = getattr(self.ui, f"k{i+1}_pom")
+            cb_enable = getattr(self.ui, f"k{i+1}_en")
+            if not cb_enable.isChecked():
+                card_hide(c.page, c.X, c.Y)
+                continue
             if klubowa.isChecked():
                 stamp_klubowa(c.page, c.X, c.Y, 0.65 if opacity else 1)
             if wlasna.isChecked():
                 stamp_wlasna(c.page, c.X, c.Y, 0.65 if opacity else 1)
             if dop.isChecked():
-                stamp_dop(c.page, c.X, c.Y)
+                stamp_dop(c.page, c.X, c.Y, True if pomoc.isChecked() else False)
+            if pomoc.isChecked():
+                stamp_pom(c.page, c.X, c.Y)
         self.score_sheet.save(filename[0])
         QMessageBox.information(
             self, "Zrobione!",
             f"Ostemplowane metryczki zapisano do: {filename[0]}"
         )
+        self.score_sheet.reset()
 
 
 if __name__ == "__main__":

@@ -84,22 +84,49 @@ def stamp(page, x, y, color, text, size=20, opacity=1):
                      fill_opacity=opacity)
 
 
-def stamp_dop(page, x, y):
+def stamp_dop(page, x, y, second_line=False):
     """
     Pieczątka "dopuszczenie".
 
     Uwaga: pozycja obliczna na podstawie lokalizacji napisu "pieczątka" na metryczce.
+    Jeśli jednocześnie ma być pieczątka "dopuszczenie" oraz "pomocnik", należy
+     ustawić parametr second_line na True.
     """
+    y_offset = 0
+    if second_line:
+        y_offset = 20
     clr = pymupdf.utils.getColor("blue")
-    page.draw_rect([x-95, y+47, x-48, y+67], color=clr, width=2.5)
+    page.draw_rect([x-95, y+47+y_offset, x-48, y+67+y_offset], color=clr, width=2.5)
     font = resource_path("fonts/lmroman12-bold.otf")
-    page.insert_text(pymupdf.Point(x-92, y+62),
+    page.insert_text(pymupdf.Point(x-92, y+62+y_offset),
                      "DOP.",
                      fontfile=font,
                      fontname="f0",
                      fontsize=15,
                      rotate=0,
                      color=clr)
+
+
+def stamp_pom(page, x, y):
+    """
+    Pieczątka "POMOCNIK".
+
+    Uwaga: pozycja obliczna na podstawie lokalizacji napisu "pieczątka" na metryczce.
+    """
+    clr = pymupdf.utils.getColor("deeppink3")
+    page.draw_rect([x-120, y+47, x-48, y+67], color=clr, width=2.5)
+    font = resource_path("fonts/lmroman12-bold.otf")
+    page.insert_text(pymupdf.Point(x-117, y+62),
+                     "POMOC",
+                     fontfile=font,
+                     fontname="f0",
+                     fontsize=15,
+                     rotate=0,
+                     color=clr)
+
+
+def card_hide(page, x, y):
+    page.draw_rect([x-361, y-18, x+119, y+88], color=(1, 1, 1), fill=(1, 1, 1), width=1)
 
 
 def stamp_wlasna(page, x, y, opacity=1):
@@ -146,6 +173,21 @@ def main():
             dop_cnt = int(dop_input)
     print("\n")
 
+    pom = input('Czy pełnisz funkcję pomocnika na zawodach? \n'
+                'Uwaga: Twoje prawo do statusu "pomocnika" powinno być ZAWSZE ustalane z '
+                'organizatorem zawodów.\n[t]ak/[N]ie\n')
+    pom_cnt = 0
+    if pom in ["t", "T"]:
+        pom_input = input("   na ilu metryczkach? [1] ")
+        if not pom_input:
+            pom_cnt = 1
+        elif not pom_input.isdigit() or int(pom_input) < 1:
+            print("\nProszę podać liczbę większą od 0")
+            exit(1)
+        else:
+            pom_cnt = int(pom_input)
+    print("\n")
+
     doc = pymupdf.open(file)
     stamp_pos = (0, 0)
     for page in doc:
@@ -155,20 +197,28 @@ def main():
                 stamp_pos = (r[0], r[1])
                 continue
             if r[4][:-1] in t_zawody:
-                choice = input(f"{r[4][:-1]}   -  [w]łasna/[k]lubowa/[P]omiń:  ")
+                choice = input(f"{r[4][:-1]}   -  [w]łasna/[k]lubowa/[z]akryj/[P]omiń:  ")
                 if choice in ["W", "w"]:
                     stamp_wlasna(page, stamp_pos[0], stamp_pos[1])
                     print("WŁASNA")
                 elif choice in ["K", "k"]:
                     stamp_klubowa(page, stamp_pos[0], stamp_pos[1])
                     print("KLUBOWA")
+                elif choice in ["Z", "z"]:
+                    card_hide(page, stamp_pos[0], stamp_pos[1])
+                    print("ZAKRYTE\n\n")
+                    continue  # symbol dopuszczenia tylko na ostemplowanych metryczkach
                 else:
                     print("POMINIĘTE\n\n")
                     continue  # symbol dopuszczenia tylko na ostemplowanych metryczkach
                 if dop_cnt > 0:
-                    stamp_dop(page, stamp_pos[0], stamp_pos[1])
+                    stamp_dop(page, stamp_pos[0], stamp_pos[1], True if pom_cnt > 0 else False)
                     print("DOP!")
                     dop_cnt -= 1
+                if pom_cnt > 0:
+                    stamp_pom(page, stamp_pos[0], stamp_pos[1])
+                    print("POMOCNIK!")
+                    pom_cnt -= 1
                 print("\n")
     if doc:
         new_name = file[:-4] + "-STAMP" + file[-4:]

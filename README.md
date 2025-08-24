@@ -15,6 +15,11 @@ Po wybraniu interesujących nas konkurencji do "opieczętowania" należy wygener
 Z zakładki *Releases* na Githubie należy kliknąć aktualną wersję (*Latest*), następnie z drzewka *Assets* pobrać, oraz uruchomić plik ``metryczka.exe`` - to jest skompilowane archiwum zawierające program, interpreter języka Python oraz m.in. biblioteki Qt6.
 Plik wynikowy został wygenerowany przy pomocy narzędzia ``pyinstaller``.
 
+## Instalacja w środowisku Linux (pojedynczy plik BIN)
+
+Z zakładki *Releases* na Githubie należy kliknąć aktualną wersję (*Latest*), następnie z drzewka *Assets* pobrać, oraz uruchomić plik ``metryczka.bin`` - to jest skompilowane archiwum zawierające program, interpreter języka Python oraz m.in. biblioteki Qt6. Przed uruchomienime należy nadać uprawnienia wykonywalności ``chmod +x metryczka.bin``.
+Plik wynikowy został wygenerowany przy pomocy narzędzia ``pyinstaller``.
+
 ## Instalacja w środowisku Windows (Python + Virtual Env)
 
 1. Program był pisany w środowisku Linux, ale przy użyciu bibliotek, które mają wsparcie dla systemu Windows, więc *wszystko powinno działać*.
