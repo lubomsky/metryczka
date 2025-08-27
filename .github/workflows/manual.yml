@@ -18,13 +18,22 @@ jobs:
               pyinstaller -F -w --add-data="fonts/*:fonts" -n metryczka metryczka.py &&
               cd dist/ &&
               zip -r9 metryczka metryczka.app/
-            OUT_FILE_NAME: metryczka.zip
+            OUT_FILE_NAME: metryczka-apple-arm.zip
+            ASSET_MIME: application/zip
+
+          - os: macos-13
+            TARGET: macos
+            CMD_BUILD: >
+              pyinstaller -F -w --add-data="fonts/*:fonts" -n metryczka metryczka.py &&
+              cd dist/ &&
+              zip -r9 metryczka metryczka.app/
+            OUT_FILE_NAME: metryczka-apple-intel.zip
             ASSET_MIME: application/zip
 
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: pyinstaller -F -w --add-data="fonts/*:fonts" -n metryczka metryczka.py
-            OUT_FILE_NAME: metryczka.exe
+            OUT_FILE_NAME: metryczka-windows.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
 
           - os: ubuntu-latest
@@ -33,7 +42,7 @@ jobs:
               pyinstaller -F -w --add-data="fonts/*:fonts" -n metryczka metryczka.py &&
               cd dist/ &&
               tar -czvf metryczka.tar.gz metryczka
-            OUT_FILE_NAME: metryczka.tar.gz
+            OUT_FILE_NAME: metryczka-linux.tar.gz
             ASSET_MIME: application/gzip
 
     steps:
